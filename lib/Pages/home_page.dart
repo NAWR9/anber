@@ -1,4 +1,5 @@
 import 'package:anber/Components/my_button.dart';
+import 'package:anber/Pages/new_sakka.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,13 +65,21 @@ class HomePage extends StatelessWidget {
                 children: [
                   MyButton(
                     text: 'Play',
-                    onTap: () {},
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 45, vertical: 15),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NewSakka(),
+                        )),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   MyButton(
                     text: 'History',
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 45, vertical: 15),
                     onTap: () {},
                   ),
                   const SizedBox(
@@ -78,6 +87,8 @@ class HomePage extends StatelessWidget {
                   ),
                   MyButton(
                     text: 'Exit',
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 45, vertical: 15),
                     onTap: () {},
                   ),
                 ],
