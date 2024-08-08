@@ -2,15 +2,10 @@ import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class NeuBoxButton extends StatelessWidget {
+class NeuBoxHome extends StatelessWidget {
   final Widget? child;
   final EdgeInsetsGeometry? padding;
-  final Color color;
-  const NeuBoxButton(
-      {super.key,
-      required this.child,
-      required this.padding,
-      required this.color});
+  const NeuBoxHome({super.key, required this.child, required this.padding});
 
   @override
   Widget build(BuildContext context) {
@@ -23,12 +18,11 @@ class NeuBoxButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             // darker shadow on bottom right
-            BoxShadow(color: color, blurRadius: 15, offset: Offset(4, 4)),
-            // lighter shadow on top left
             BoxShadow(
-                color: isDarkMode ? Colors.grey.shade800 : Colors.white,
-                blurRadius: 5,
-                offset: Offset(-4, -4)),
+                color: isDarkMode ? Colors.black : Colors.grey.shade500,
+                blurRadius: 8,
+                offset: Offset(6, 6)),
+            // lighter shadow on top left
           ]),
       padding: padding,
       child: child,

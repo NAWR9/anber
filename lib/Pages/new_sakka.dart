@@ -25,6 +25,7 @@ class _NewSakkaState extends State<NewSakka> {
   late final FocusNode lhm_node;
   late List sakka_score;
   late List<List<int>> sakka_score_history;
+  late SakkaDatabase sakkaDatabase; // Add a reference to SakkaDatabase
 
   bool isWinLna = false;
   bool isWinLhm = false;
@@ -49,12 +50,21 @@ class _NewSakkaState extends State<NewSakka> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    sakkaDatabase = context.read<SakkaDatabase>(); // Save the reference here
+  }
+
+  @override
   void dispose() {
-    super.dispose();
+    // Use the saved reference to call sakkaEnded
+    sakkaDatabase.sakkaEnded(widget.sakka_id);
+
+    // Dispose of controllers and focus nodes
     lna_controller.dispose();
     lhm_controller.dispose();
     lhm_node.dispose();
-    context.read<SakkaDatabase>().sakkaEnded(widget.sakka_id);
+    super.dispose();
   }
 
   void IncrementPressed(BuildContext context) {
@@ -224,7 +234,12 @@ class _NewSakkaState extends State<NewSakka> {
                       children: [
                         // Back button
                         IconButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              context
+                                  .read<SakkaDatabase>()
+                                  .sakkaEnded(widget.sakka_id);
+                            },
                             icon: Icon(
                               Icons.arrow_back,
                               color:
