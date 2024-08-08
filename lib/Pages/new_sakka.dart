@@ -1,15 +1,19 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:anber/Components/my_button.dart';
-import 'package:anber/Components/my_textfield.dart';
 import 'package:anber/Components/neu_box.dart';
 import 'package:anber/Components/neu_box_button.dart';
+import 'package:anber/Components/score_dialog.dart';
+import 'package:anber/Components/win_dialog.dart';
+import 'package:anber/Models/sakka.dart';
+import 'package:anber/Models/sakka_database.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class NewSakka extends StatefulWidget {
-  const NewSakka({super.key});
+  final int sakka_id;
+  const NewSakka({super.key, required this.sakka_id});
 
   @override
   State<NewSakka> createState() => _NewSakkaState();
@@ -19,6 +23,20 @@ class _NewSakkaState extends State<NewSakka> {
   late final TextEditingController lna_controller;
   late final TextEditingController lhm_controller;
   late final FocusNode lhm_node;
+  late List sakka_score;
+  late List<List<int>> sakka_score_history;
+
+  bool isWinLna = false;
+  bool isWinLhm = false;
+  var loaded = false;
+
+  ScrollController _scrollController1 = ScrollController();
+  ScrollController _scrollController2 = ScrollController();
+
+  scrollToBottom() {
+    _scrollController1.jumpTo(_scrollController1.position.maxScrollExtent);
+    _scrollController2.jumpTo(_scrollController2.position.maxScrollExtent);
+  }
 
   @override
   void initState() {
@@ -26,6 +44,8 @@ class _NewSakkaState extends State<NewSakka> {
     lna_controller = TextEditingController();
     lhm_controller = TextEditingController();
     lhm_node = FocusNode();
+    sakka_score_history = [[], []];
+    sakka_score = [0, 0];
   }
 
   @override
@@ -34,49 +54,92 @@ class _NewSakkaState extends State<NewSakka> {
     lna_controller.dispose();
     lhm_controller.dispose();
     lhm_node.dispose();
+    context.read<SakkaDatabase>().sakkaEnded(widget.sakka_id);
   }
 
   void IncrementPressed(BuildContext context) {
+    getScore();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ScoreDialog(
+          lhm_controller: lhm_controller,
+          lhm_node: lhm_node,
+          lna_controller: lna_controller,
+          sakka_id: widget.sakka_id,
+          sakka_score_history: sakka_score_history,
+          showWinDialog: checkWinCondition, // Pass the win condition checker,
+        );
+      },
+    );
+  }
+
+  void RedoPressed() {
+    int last_lna = sakka_score_history[0].removeLast();
+    int last_lhm = sakka_score_history[1].removeLast();
+    context
+        .read<SakkaDatabase>()
+        .removeLastScore(widget.sakka_id, last_lna, last_lhm);
+  }
+
+  void getScore() async {
+    sakka_score = await context.read<SakkaDatabase>().GetScore(widget.sakka_id);
+    print(sakka_score);
+    print(sakka_score_history);
+  }
+
+  void checkWinCondition() {
+    int lna = sakka_score_history[0].fold(0, (sum, element) => sum + element);
+    int lhm = sakka_score_history[1].fold(0, (sum, element) => sum + element);
+
+    if (lna >= 152 || lhm >= 152) {
+      if (lna > lhm) {
+        isWinLna = true;
+      } else if (lhm > lna) {
+        isWinLhm = true;
+      }
+
+      showWinDialog();
+    }
+  }
+
+  void showWinDialog() {
+    if (isWinLna) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return WinDialog(
+            isLnaWin: true,
+            redo: RedoPressed,
+          );
+        },
+      );
+    }
+    if (isWinLhm) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return WinDialog(
+            isLnaWin: false,
+            redo: RedoPressed,
+          );
+        },
+      );
+    }
+  }
+
+  void replayPressed() {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 70,
-                height: 50,
-                child: MyTextfield(
-                  onChanged: (value) {
-                    if (value.length == 2) {
-                      lhm_node.unfocus();
-                    }
-                  },
-                  node: lhm_node,
-                  controller: lhm_controller,
-                  autofocus: false,
-                  hint: "لهم",
-                  label: "لهم",
-                ),
-              ),
-              SizedBox(
-                width: 70,
-                height: 50,
-                child: MyTextfield(
-                  onChanged: (value) {
-                    if (value.length == 2) {
-                      lhm_node.requestFocus();
-                    }
-                  },
-                  controller: lna_controller,
-                  autofocus: true,
-                  hint: "لنا",
-                  label: "لنا",
-                ),
-              ),
-            ],
+          content: Text(
+            "هل انت متأكد من إعادة الصكه؟",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.inversePrimary,
+                fontSize: 18),
           ),
           actions: [
             Row(
@@ -85,7 +148,9 @@ class _NewSakkaState extends State<NewSakka> {
                 Expanded(
                   child: MyButton(
                     text: "الغاء",
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   ),
@@ -97,7 +162,19 @@ class _NewSakkaState extends State<NewSakka> {
                   flex: 2,
                   child: MyButton(
                     text: "تأكيد",
-                    onTap: () {},
+                    onTap: () async {
+                      Navigator.pop(context);
+                      int sakka_id =
+                          await context.read<SakkaDatabase>().CreateSakka();
+
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewSakka(
+                              sakka_id: sakka_id,
+                            ),
+                          ));
+                    },
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   ),
@@ -112,19 +189,73 @@ class _NewSakkaState extends State<NewSakka> {
 
   @override
   Widget build(BuildContext context) {
+    // sakka database
+    final sakkaDatabase = context.watch<SakkaDatabase>();
+
+    //current sakkas
+    List<Sakka> currentSakka = sakkaDatabase.currentSakkas;
+    int lhm = currentSakka.last.lhm_score;
+    int lna = currentSakka.last.lna_score;
+    if (lna >= 152 || lhm >= 152) {
+      if (lna > lhm) {
+        isWinLna = true;
+      } else if (lhm > lna) {
+        isWinLhm = true;
+      }
+    }
+    if (loaded)
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+    getScore();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Dark Mode switch
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IconButton(
+              // Buttons
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        // Back button
+                        IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              size: 30,
+                            )),
+                        // Replay Button
+                        SizedBox(
+                          height: 40,
+                          child: NeuBoxButton(
+                              color: Colors.transparent,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 3),
+                              child: MaterialButton(
+                                onPressed: replayPressed,
+                                hoverColor: Colors.transparent,
+                                splashColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                child: Text(
+                                  "اعاده",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 21,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary),
+                                ),
+                              )),
+                        ),
+                      ],
+                    ),
+                    // DarkMode Button
+                    IconButton(
                         onPressed: () =>
                             Provider.of<ThemeProvider>(context, listen: false)
                                 .toggleTheme(),
@@ -135,8 +266,8 @@ class _NewSakkaState extends State<NewSakka> {
                           color: Theme.of(context).colorScheme.inversePrimary,
                           size: 30,
                         )),
-                  )
-                ],
+                  ],
+                ),
               ),
               // lna lhm titles and current scores
               Padding(
@@ -164,7 +295,7 @@ class _NewSakkaState extends State<NewSakka> {
                                         .inversePrimary),
                               ),
                               Text(
-                                "155",
+                                "${currentSakka.last.lhm_score}",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 19,
@@ -194,7 +325,7 @@ class _NewSakkaState extends State<NewSakka> {
                                         .inversePrimary),
                               ),
                               Text(
-                                "155",
+                                "${currentSakka.last.lna_score}",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 19,
@@ -230,7 +361,8 @@ class _NewSakkaState extends State<NewSakka> {
                       SizedBox(
                           width: 40,
                           height: 300,
-                          child: ScoreBuilder(10, "155")),
+                          child: ScoreBuilder(sakka_score_history[1].length,
+                              sakka_score_history[1], _scrollController2)),
                       // divider
                       VerticalDivider(
                         color: Theme.of(context).colorScheme.secondary,
@@ -239,7 +371,10 @@ class _NewSakkaState extends State<NewSakka> {
                       ),
                       // Lna score history
                       SizedBox(
-                          width: 40, height: 300, child: ScoreBuilder(4, "155"))
+                          width: 40,
+                          height: 300,
+                          child: ScoreBuilder(sakka_score_history[0].length,
+                              sakka_score_history[0], _scrollController1)),
                     ],
                   ),
                 ),
@@ -257,7 +392,7 @@ class _NewSakkaState extends State<NewSakka> {
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: MaterialButton(
                             // TODO:
-                            onPressed: () {},
+                            onPressed: RedoPressed,
                             hoverColor: Colors.transparent,
                             splashColor: Colors.transparent,
                             highlightColor: Colors.transparent,
@@ -307,12 +442,15 @@ class _NewSakkaState extends State<NewSakka> {
   }
 
   // Show score history
-  Widget? ScoreBuilder(int itemCount, String text) {
+  Widget? ScoreBuilder(
+      int itemCount, List text, ScrollController _scrollController) {
+    loaded = true;
     return ListView.builder(
       itemCount: itemCount,
+      controller: _scrollController,
       itemBuilder: (context, index) {
         return Text(
-          text,
+          "${text[index]}",
           style: TextStyle(
               fontSize: 22,
               color: Theme.of(context).colorScheme.inversePrimary),
