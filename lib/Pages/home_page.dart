@@ -1,9 +1,12 @@
 import 'package:anber/Components/my_button.dart';
+import 'package:anber/Components/neu_box.dart';
+import 'package:anber/Components/neu_box_home.dart';
 import 'package:anber/Models/sakka_database.dart';
 import 'package:anber/Pages/history_page.dart';
 import 'package:anber/Pages/new_sakka.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -41,69 +44,77 @@ class HomePage extends StatelessWidget {
             ),
             // Logo
             Center(
-              child: Icon(Icons.calculate_outlined,
-                  size: 90,
-                  color: Theme.of(context).colorScheme.inversePrimary),
-            ),
-            // Title
-            const SizedBox(
-              height: 30,
-            ),
-            Center(
-              child: Text(
-                "عنبر",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 40,
-                    color: Theme.of(context).colorScheme.inversePrimary),
+              child: NeuBox(
+                padding: EdgeInsets.all(0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.asset(
+                      "lib/assets/images/logo.jpeg",
+                      height: 160,
+                    )),
               ),
             ),
+            // Title
+
             const SizedBox(
-              height: 50,
+              height: 80,
             ),
             // column of buttons [new game, history, exit]
             Center(
               child: Column(
                 children: [
-                  MyButton(
-                      text: 'Play',
+                  NeuBoxHome(
+                    padding: EdgeInsets.all(0),
+                    child: MyButton(
+                        text: '! صكه جديده',
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 45, vertical: 15),
+                        onTap: () async {
+                          int sakka_id =
+                              await context.read<SakkaDatabase>().CreateSakka();
+                          await Future.delayed(
+                              const Duration(milliseconds: 30));
+                          if (context.mounted) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NewSakka(
+                                    sakka_id: sakka_id,
+                                  ),
+                                ));
+                          }
+                        }),
+                  ),
+                  const SizedBox(
+                    height: 35,
+                  ),
+                  NeuBoxHome(
+                    padding: EdgeInsets.all(0),
+                    child: MyButton(
+                      text: 'الصكات السابقه',
                       padding: const EdgeInsets.symmetric(
                           horizontal: 45, vertical: 15),
-                      onTap: () async {
-                        int sakka_id =
-                            await context.read<SakkaDatabase>().CreateSakka();
-                        await Future.delayed(const Duration(milliseconds: 30));
-                        if (context.mounted) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NewSakka(
-                                  sakka_id: sakka_id,
-                                ),
-                              ));
-                        }
-                      }),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  MyButton(
-                    text: 'History',
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 45, vertical: 15),
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HistoryPage(),
-                        )),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HistoryPage(),
+                          )),
+                    ),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 35,
                   ),
-                  MyButton(
-                    text: 'Exit',
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 45, vertical: 15),
-                    onTap: () {},
+                  NeuBoxHome(
+                    padding: const EdgeInsets.all(0),
+                    child: MyButton(
+                      color: Provider.of<ThemeProvider>(context).isDarkMode
+                          ? const Color.fromARGB(255, 124, 19, 19)
+                          : Color.fromARGB(255, 222, 96, 96),
+                      text: 'الخروج',
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 45, vertical: 15),
+                      onTap: () => SystemNavigator.pop(),
+                    ),
                   ),
                 ],
               ),
