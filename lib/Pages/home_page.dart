@@ -1,4 +1,6 @@
 import 'package:anber/Components/my_button.dart';
+import 'package:anber/Models/sakka_database.dart';
+import 'package:anber/Pages/history_page.dart';
 import 'package:anber/Pages/new_sakka.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -64,15 +66,21 @@ class HomePage extends StatelessWidget {
               child: Column(
                 children: [
                   MyButton(
-                    text: 'Play',
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 45, vertical: 15),
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const NewSakka(),
-                        )),
-                  ),
+                      text: 'Play',
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 45, vertical: 15),
+                      onTap: () async {
+                        int sakka_id =
+                            await context.read<SakkaDatabase>().CreateSakka();
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewSakka(
+                                sakka_id: sakka_id,
+                              ),
+                            ));
+                      }),
                   const SizedBox(
                     height: 10,
                   ),
@@ -80,7 +88,11 @@ class HomePage extends StatelessWidget {
                     text: 'History',
                     padding: const EdgeInsets.symmetric(
                         horizontal: 45, vertical: 15),
-                    onTap: () {},
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HistoryPage(),
+                        )),
                   ),
                   const SizedBox(
                     height: 10,

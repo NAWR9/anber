@@ -1,11 +1,25 @@
+import 'package:anber/Models/sakka_database.dart';
 import 'package:anber/Pages/home_page.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => ThemeProvider(),
+void main() async {
+  //initialize note isar database
+  WidgetsFlutterBinding.ensureInitialized();
+  await SakkaDatabase.initialize();
+
+  runApp(MultiProvider(
+    providers: [
+      // Note Provider
+      ChangeNotifierProvider(
+        create: (context) => SakkaDatabase(),
+      ),
+      // Theme Provider
+      ChangeNotifierProvider(
+        create: (context) => ThemeProvider(),
+      )
+    ],
     child: const MyApp(),
   ));
 }
