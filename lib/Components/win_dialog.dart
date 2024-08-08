@@ -41,7 +41,6 @@ class WinDialog extends StatelessWidget {
                 text: "تأكيد",
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pop(context);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

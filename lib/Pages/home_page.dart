@@ -72,14 +72,16 @@ class HomePage extends StatelessWidget {
                       onTap: () async {
                         int sakka_id =
                             await context.read<SakkaDatabase>().CreateSakka();
-
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NewSakka(
-                                sakka_id: sakka_id,
-                              ),
-                            ));
+                        await Future.delayed(const Duration(milliseconds: 30));
+                        if (context.mounted) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NewSakka(
+                                  sakka_id: sakka_id,
+                                ),
+                              ));
+                        }
                       }),
                   const SizedBox(
                     height: 10,

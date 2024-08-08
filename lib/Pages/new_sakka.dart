@@ -166,14 +166,16 @@ class _NewSakkaState extends State<NewSakka> {
                       Navigator.pop(context);
                       int sakka_id =
                           await context.read<SakkaDatabase>().CreateSakka();
-
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NewSakka(
-                              sakka_id: sakka_id,
-                            ),
-                          ));
+                      await Future.delayed(const Duration(milliseconds: 30));
+                      if (context.mounted) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewSakka(
+                                sakka_id: sakka_id,
+                              ),
+                            ));
+                      }
                     },
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

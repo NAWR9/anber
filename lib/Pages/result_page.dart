@@ -156,7 +156,7 @@ class ResultPage extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               // row (replay , home)
@@ -199,14 +199,17 @@ class ResultPage extends StatelessWidget {
                               int sakka_id = await context
                                   .read<SakkaDatabase>()
                                   .CreateSakka();
-
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NewSakka(
-                                      sakka_id: sakka_id,
-                                    ),
-                                  ));
+                              await Future.delayed(
+                                  const Duration(milliseconds: 30));
+                              if (context.mounted) {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewSakka(
+                                        sakka_id: sakka_id,
+                                      ),
+                                    ));
+                              }
                             },
                             hoverColor: Colors.transparent,
                             splashColor: Colors.transparent,
