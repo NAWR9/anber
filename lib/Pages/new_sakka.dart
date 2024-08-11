@@ -7,6 +7,7 @@ import 'package:anber/Components/score_dialog.dart';
 import 'package:anber/Components/win_dialog.dart';
 import 'package:anber/Models/sakka.dart';
 import 'package:anber/Models/sakka_database.dart';
+import 'package:anber/Pages/home_page.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -215,8 +216,9 @@ class _NewSakkaState extends State<NewSakka> {
         isWinLhm = true;
       }
     }
-    if (loaded)
+    if (loaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+    }
     getScore();
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -235,10 +237,14 @@ class _NewSakkaState extends State<NewSakka> {
                         // Back button
                         IconButton(
                             onPressed: () {
-                              Navigator.pop(context);
-                              context
-                                  .read<SakkaDatabase>()
-                                  .sakkaEnded(widget.sakka_id);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(
+                                      continueSakka: true,
+                                      past_sakka_id: widget.sakka_id,
+                                    ),
+                                  ));
                             },
                             icon: Icon(
                               Icons.arrow_back,

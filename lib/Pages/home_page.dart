@@ -10,7 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  bool? continueSakka = false;
+  int? past_sakka_id;
+  HomePage({super.key, this.continueSakka, this.past_sakka_id});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,7 @@ class HomePage extends StatelessWidget {
             // Logo
             Center(
               child: NeuBox(
-                padding: EdgeInsets.all(0),
+                padding: const EdgeInsets.all(0),
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.asset(
@@ -63,25 +65,47 @@ class HomePage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
+                  continueSakka ?? false
+                      ? Padding(
+                          padding: const EdgeInsets.only(bottom: 30.0),
+                          child: NeuBoxHome(
+                            padding: EdgeInsets.all(0),
+                            child: MyButton(
+                                text: 'أكمل الصكه',
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 45, vertical: 15),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                }),
+                          ),
+                        )
+                      : const SizedBox(),
                   NeuBoxHome(
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
                     child: MyButton(
                         text: '! صكه جديده',
                         padding: const EdgeInsets.symmetric(
                             horizontal: 45, vertical: 15),
                         onTap: () async {
+                          if (continueSakka ?? false) {
+                            await context
+                                .read<SakkaDatabase>()
+                                .sakkaEnded(past_sakka_id!);
+                          }
                           int sakka_id =
                               await context.read<SakkaDatabase>().CreateSakka();
                           await Future.delayed(
                               const Duration(milliseconds: 30));
                           if (context.mounted) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NewSakka(
-                                    sakka_id: sakka_id,
-                                  ),
-                                ));
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NewSakka(
+                                  sakka_id: sakka_id,
+                                ),
+                              ),
+                              (route) => route.isFirst,
+                            );
                           }
                         }),
                   ),

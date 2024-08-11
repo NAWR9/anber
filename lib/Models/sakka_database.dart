@@ -96,12 +96,12 @@ class SakkaDatabase extends ChangeNotifier {
     if (currentSakkas.last.lhm_score >= 152 ||
         currentSakkas.last.lna_score >= 152) {
     } else {
-      deleteNote(id);
+      deleteSakka(id);
     }
   }
 
   //DELETE - a note from db
-  Future<void> deleteNote(int id) async {
+  Future<void> deleteSakka(int id) async {
     await isar.writeTxn(() => isar.sakkas.delete(id));
 
     await fetchSakkas();
