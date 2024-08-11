@@ -15,14 +15,21 @@ class HistoryPage extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                      size: 30,
+                    )),
+                SizedBox(
                   width: 150,
                   height: 70,
                   child: Center(
                     child: Padding(
-                      padding: EdgeInsets.only(right: 5.0),
+                      padding: const EdgeInsets.only(right: 5.0),
                       child: Text(
                         "السجل",
                         textAlign: TextAlign.end,
@@ -44,17 +51,24 @@ class HistoryPage extends StatelessWidget {
                     .fetchSakkas(), // Assuming loadData fetches your data
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text("Error loading data"));
+                    return const Center(child: Text("Error loading data"));
                   } else {
                     List<Sakka> currentSakkas =
-                        context.read<SakkaDatabase>().currentSakkas;
+                        Provider.of<SakkaDatabase>(context).currentSakkas;
                     List<Sakka> currentSakkasReversed =
                         currentSakkas.reversed.toList();
 
                     if (currentSakkasReversed.isEmpty) {
-                      return Center(child: Text("No data available"));
+                      return Center(
+                          child: Text(
+                        "لا توجد صكه",
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
+                      ));
                     }
 
                     return ListView.builder(
@@ -76,54 +90,72 @@ class HistoryPage extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Column(
+                                  IconButton(
+                                      onPressed: () {
+                                        context
+                                            .read<SakkaDatabase>()
+                                            .deleteSakka(sakka.id);
+                                      },
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                        size: 19,
+                                      )),
+                                  Expanded(
+                                      child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
-                                      Text(
-                                        "لهم",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inversePrimary,
-                                        ),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            "لهم",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${sakka.lhm_score}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 19,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      Text(
-                                        "${sakka.lhm_score}",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 19,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inversePrimary,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "لنا",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inversePrimary,
-                                        ),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            "لنا",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${sakka.lna_score}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 19,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      Text(
-                                        "${sakka.lna_score}",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 19,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inversePrimary,
-                                        ),
-                                      )
                                     ],
-                                  ),
+                                  ))
                                 ],
                               ),
                             ),
