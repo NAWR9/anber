@@ -1,5 +1,6 @@
 import 'package:anber/Models/sakka_database.dart';
 import 'package:anber/Pages/home_page.dart';
+import 'package:anber/Pages/splash_page.dart';
 import 'package:anber/Themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ThemeProvider>(context).themeData,
-      home: HomePage(),
+      home: SplashPage(),
     );
   }
 }
