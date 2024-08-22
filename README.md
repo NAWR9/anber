@@ -1,5 +1,7 @@
 # Anber - PLOT Calculator
 
+![Anber Logo](lib/assets/images/logo.jpeg)
+
 **Anber** is a PLOT calculator designed to keep track of the current score in a game and display the results of previous games. Built with **Flutter** and **Isar Local Database**, Anber provides an intuitive and efficient way to manage game scores.
 
 ## Features
