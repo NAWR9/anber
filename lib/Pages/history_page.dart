@@ -57,10 +57,10 @@ class HistoryPage extends StatelessWidget {
                   } else {
                     List<Sakka> currentSakkas =
                         Provider.of<SakkaDatabase>(context).currentSakkas;
-                    if (currentSakkas.last.lhm_score < 152 &&
-                        currentSakkas.last.lna_score < 152) {
-                      currentSakkas.removeLast();
-                    }
+                    // if (currentSakkas.last.lhm_score < 152 &&
+                    //     currentSakkas.last.lna_score < 152) {
+                    //   currentSakkas.removeLast();
+                    // }
                     List<Sakka> currentSakkasReversed =
                         currentSakkas.reversed.toList();
 
@@ -111,16 +111,28 @@ class HistoryPage extends StatelessWidget {
                                       )),
                                   SakkaNotEnded
                                       ? Text(
-                                          "!الصكه لم تنتهي",
+                                          "!لم تنتهي",
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 10,
+                                            fontSize: 13,
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .inversePrimary,
                                           ),
                                         )
-                                      : SizedBox(),
+                                      : Opacity(
+                                          opacity: 0,
+                                          child: Text(
+                                            "!لم تنتهي",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                            ),
+                                          ),
+                                        ),
                                   Expanded(
                                       child: Row(
                                     mainAxisAlignment:

@@ -1,4 +1,5 @@
 import 'package:anber/Components/neu_box_button.dart';
+import 'package:anber/Components/neu_box_home.dart';
 import 'package:anber/Models/sakka.dart';
 import 'package:anber/Models/sakka_database.dart';
 import 'package:anber/Pages/new_sakka.dart';
@@ -166,8 +167,7 @@ class ResultPage extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: NeuBoxButton(
-                          color: Colors.red.shade400,
+                      child: NeuBoxHome(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: MaterialButton(
                             // TODO:
@@ -191,8 +191,7 @@ class ResultPage extends StatelessWidget {
                     ),
                     Expanded(
                       flex: 2,
-                      child: NeuBoxButton(
-                          color: Colors.orange.shade200,
+                      child: NeuBoxHome(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: MaterialButton(
                             onPressed: () async {
