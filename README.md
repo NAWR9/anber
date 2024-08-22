@@ -30,7 +30,7 @@ Before you begin, ensure you have met the following requirements:
    flutter pub get
    ```
 3. **Run the App**:
-4. ```bash
+   ```bash
    flutter run
    ```
 
