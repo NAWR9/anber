@@ -57,6 +57,10 @@ class HistoryPage extends StatelessWidget {
                   } else {
                     List<Sakka> currentSakkas =
                         Provider.of<SakkaDatabase>(context).currentSakkas;
+                    if (currentSakkas.last.lhm_score < 152 &&
+                        currentSakkas.last.lna_score < 152) {
+                      currentSakkas.removeLast();
+                    }
                     List<Sakka> currentSakkasReversed =
                         currentSakkas.reversed.toList();
 
@@ -75,6 +79,10 @@ class HistoryPage extends StatelessWidget {
                       itemCount: currentSakkasReversed.length,
                       itemBuilder: (context, index) {
                         Sakka sakka = currentSakkasReversed[index];
+                        bool SakkaNotEnded = false;
+                        if (sakka.lhm_score < 152 && sakka.lna_score < 152) {
+                          SakkaNotEnded = true;
+                        }
 
                         return Padding(
                           padding: const EdgeInsets.all(20),
@@ -101,6 +109,18 @@ class HistoryPage extends StatelessWidget {
                                         color: Colors.red,
                                         size: 19,
                                       )),
+                                  SakkaNotEnded
+                                      ? Text(
+                                          "!الصكه لم تنتهي",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .inversePrimary,
+                                          ),
+                                        )
+                                      : SizedBox(),
                                   Expanded(
                                       child: Row(
                                     mainAxisAlignment:
